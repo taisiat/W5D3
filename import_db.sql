@@ -1,34 +1,11 @@
 PRAGMA foreign_keys = ON;
-CREATE TABLE users (
-    id INTEGER PRIMARY KEY,
-    fname TEXT NOT NULL,
-    lname TEXT NOT NULL
-);
-
-CREATE TABLE questions (
-    id INTEGER PRIMARY KEY,
-    title VARCHAR(300),
-    body TEXT NOT NULL,
-    user_id INTEGER NOT NULL,
-
-    FOREIGN KEY (user_id) REFERENCES users(id)
-);
-
-CREATE TABLE question_follows (
-    id INTEGER PRIMARY KEY,
-    question_id INTEGER NOT NULL,
-    user_id INTEGER NOT NULL,
-
-    FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (question_id) REFERENCES questions(id)
-);
 
 -- id   question   user 
 -- 1    oop        tk
 -- 2    sql        tk
 -- 3    oop        ahmed
 -- 4    sql        darren
-
+DROP TABLE IF EXISTS replies;
 CREATE TABLE replies (
     id INTEGER PRIMARY KEY,
     body TEXT NOT NULL,
@@ -45,7 +22,7 @@ CREATE TABLE replies (
 -- 1          "yeah it mean obkeect orient"     id(of qest)      null           darren
 -- 2          "no that's wrong, it is whatever" id(of qest)      1              taylor
 -- 3          "thanks"                          id(of qest)      2              tk
-
+DROP TABLE IF EXISTS question_likes;
 CREATE TABLE question_likes (
     id INTEGER PRIMARY KEY,
     question_id INTEGER NOT NULL,
@@ -53,6 +30,34 @@ CREATE TABLE question_likes (
 
     FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (question_id) REFERENCES questions(id)
+);
+
+
+DROP TABLE IF EXISTS question_follows;
+CREATE TABLE question_follows (
+    id INTEGER PRIMARY KEY,
+    question_id INTEGER NOT NULL,
+    user_id INTEGER NOT NULL,
+
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (question_id) REFERENCES questions(id)
+);
+
+DROP TABLE IF EXISTS questions;
+CREATE TABLE questions (
+    id INTEGER PRIMARY KEY,
+    title VARCHAR(300),
+    body TEXT NOT NULL,
+    user_id INTEGER NOT NULL,
+
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+DROP TABLE IF EXISTS users;
+CREATE TABLE users (
+    id INTEGER PRIMARY KEY,
+    fname TEXT NOT NULL,
+    lname TEXT NOT NULL
 );
 
 INSERT INTO 
@@ -81,4 +86,3 @@ INSERT INTO
 VALUES 
     (1, 2);
 
-    
