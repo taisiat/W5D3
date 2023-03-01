@@ -30,10 +30,32 @@ class User
         User.new(user.first)
     end
 
+    def self.find_by_name(fname, lname)
+        users = QuestionsDatabase.instance.execute(<<-SQL, fname, lname)
+        SELECT
+            *
+        FROM
+            users
+        WHERE
+            fname = ? AND lname = ?
+        SQL
+        return nil unless users.length > 0 # person is stored in an array!
+
+        users.map { |option| User.new(option) }
+    end
+
     def initialize(options)
         @id = options['id']
         @fname = options['fname']
         @lname = options['lname']
+    end
+
+    def authored_questions
+        Question.find_by_author_id(self.id)
+    end
+
+    def authored_replies
+        Reply.find_by_user_id(self.id)
     end
 
 end
@@ -80,6 +102,15 @@ class Question
         @body = options['body']
         @user_id = options['user_id']
     end
+
+    def author
+        User.find_by_id(self.user_id)
+    end
+
+    def replies
+        Reply.find_by_question_id(self.id)
+    end
+
 
 
 end
@@ -146,12 +177,46 @@ class Reply
         replies
     end
 
+    def self.find_by_question_id(question_id)
+        replies = []
+        
+        question_replies = QuestionsDatabase.instance.execute(<<-SQL, question_id)
+        SELECT
+            *
+        FROM
+            replies
+        WHERE
+            question_id = ?
+        SQL
+        return nil unless question_replies.length > 0
+
+        question_replies.each { |option| replies << Reply.new(option) }
+        
+        replies
+    end
+
     def initialize(options)
         @id = options['id']
         @body = options['body']
         @question_id = options['question_id']
         @parent_reply_id = options['parent_reply_id']
         @author_id = options['author_id']
+    end
+
+    def author
+        User.find_by_id(self.author_id)
+    end
+
+    def question
+        Question.find_by_id(self.question_id)
+    end
+
+    def parent_reply
+        Reply.find_by_id(self.parent_reply_id)
+    end
+
+    def child_replies
+        Reply.find_by_id(self.id)
     end
 
 end
