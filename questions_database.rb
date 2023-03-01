@@ -56,6 +56,24 @@ class Question
         Question.new(question.first)
     end
 
+    def self.find_by_author_id(author_id)
+        question = []
+        
+        author_questions = QuestionsDatabase.instance.execute(<<-SQL, author_id)
+        SELECT
+            *
+        FROM
+            questions
+        WHERE
+            user_id = ?
+        SQL
+        return nil unless author_questions.length > 0
+
+        author_questions.each { |option| question << Question.new(option) }
+        
+        question
+    end
+
     def initialize(options)
         @id = options['id']
         @title = options['title']
@@ -108,6 +126,24 @@ class Reply
         return nil unless reply.length > 0
 
         Reply.new(reply.first)
+    end
+
+    def self.find_by_user_id(user_id)
+        replies = []
+        
+        user_replies = QuestionsDatabase.instance.execute(<<-SQL, user_id)
+        SELECT
+            *
+        FROM
+            replies
+        WHERE
+            author_id = ?
+        SQL
+        return nil unless user_replies.length > 0
+
+        user_replies.each { |option| replies << Reply.new(option) }
+        
+        replies
     end
 
     def initialize(options)

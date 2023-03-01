@@ -64,7 +64,8 @@ INSERT INTO
     users (fname, lname)
 VALUES 
     ('Ahmed', 'R'), 
-    ('Taisia', 'K');
+    ('Taisia', 'K'),
+    ('Darren', 'T');
 
 INSERT INTO 
     questions (title, body, user_id)
@@ -79,7 +80,10 @@ VALUES
 INSERT INTO 
     replies (body, question_id, parent_reply_id, author_id)
 VALUES 
-    ('OOP is Obje,, Or,, Pro,,', 1, null, 1);
+    ('OOP is Obje,, Or,, Pro,,', 1, null, 1),
+    ('cool,', 1, 1, 2),
+    ('you got it', 1, 2, 1),
+    ('so smart', 1, 3, 3);
 
 INSERT INTO 
     question_likes (question_id, user_id)
