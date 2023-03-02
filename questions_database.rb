@@ -58,6 +58,10 @@ class User
         Reply.find_by_user_id(self.id)
     end
 
+    def followed_questions
+        QuestionFollow.followed_questions_for_user_id(self.id)
+    end
+
 end
 
 class Question
@@ -111,6 +115,9 @@ class Question
         Reply.find_by_question_id(self.id)
     end
 
+    def followers
+        QuestionFollow.followers_for_question_id(self.id)
+    end
 
 
 end
@@ -131,6 +138,62 @@ class QuestionFollow
         return nil unless question_follow.length > 0
 
         QuestionFollow.new(question_follow.first)
+    end
+
+    def self.followers_for_question_id(question_id)
+        users = []
+
+        question_followers = QuestionsDatabase.instance.execute(<<-SQL, question_id)
+        SELECT
+            user_id
+        FROM
+            question_follows
+        WHERE
+            question_id = ?;
+        SQL
+        return nil unless question_followers.length > 0
+
+        question_followers.each { |user| users << User.find_by_id(user["user_id"])}
+
+        users
+    end
+
+    def self.followed_questions_for_user_id(user_id)
+        questions = []
+
+        follower_questions = QuestionsDatabase.instance.execute(<<-SQL, user_id)
+        SELECT
+            question_id
+        FROM
+            question_follows
+        WHERE
+            user_id = ?;
+        SQL
+        return nil unless follower_questions.length > 0
+
+        follower_questions.each { |question| questions << Question.find_by_id(question["question_id"])}
+
+        questions
+    end
+
+    def self.most_followed_questions(n)
+        questions = []
+
+        questions_arr = QuestionsDatabase.instance.execute(<<-SQL, n)
+        SELECT
+            question_id
+        FROM
+            question_follows
+        GROUP BY
+            x
+        ORDER BY
+            gemsglkkn;
+        SQL
+        return nil unless follower_questions.length > 0
+
+        follower_questions.each { |question| questions << Question.find_by_id(question["question_id"])}
+
+        questions
     end
 
     def initialize(options)
@@ -216,8 +279,26 @@ class Reply
     end
 
     def child_replies
-        Reply.find_by_id(self.id)
+        replies = []
+        
+        user_replies = QuestionsDatabase.instance.execute(<<-SQL)
+        SELECT
+            *
+        FROM
+            replies;
+        SQL
+        return nil unless user_replies.length > 0
+
+        user_replies.each { |reply| replies << Reply.new(reply) if self.id == reply["parent_reply_id"] }
+        
+        replies
     end
+
+    # what is oop?
+    # 1. oop is obj...
+    # 2. cool - what reply has a parent reply is that is my id ie 2
+    # 3. you got it - parent reply id is 2
+    # 4. so smart
 
 end
 
